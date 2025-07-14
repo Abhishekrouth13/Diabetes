@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Diabetes Predictor</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="bg-overlay"></div>
+    <div class="container">
+        <div class="form-box">
+            <img src="{{ url_for('static', filename='diabetes-icon.png') }}" alt="Diabetes Icon" class="icon">
+            <h2>Diabetes Risk Prediction</h2>
+            <form action="/" method="post">
+                <div class="form-group">
+                    <label>
+                        Pregnancies
+                        <span class="tooltip">
+                            <button type="button" class="info-btn" onclick="showInfo('pregnancies')">&#9432;</button>
+                            <span class="tooltiptext">Learn more</span>
+                        </span>
+                    </label>
+                    <input type="number" name="Pregnancies" value="{{ request.form.get('Pregnancies', '') }}" required>
+                </div>
+                <div class="form-group">
+                    <label>
+                        Glucose
+                        <span class="tooltip">
+                            <button type="button" class="info-btn" onclick="showInfo('glucose')">&#9432;</button>
+                            <span class="tooltiptext">Learn more</span>
+                        </span>
+                    </label>
+                    <input type="number" name="Glucose" value="{{ request.form.get('Glucose', '') }}" required>
+                </div>
+                <div class="form-group">
+                    <label>
+                        Blood Pressure
+                        <span class="tooltip">
+                            <button type="button" class="info-btn" onclick="showInfo('bloodPressure')">&#9432;</button>
+                            <span class="tooltiptext">Learn more</span>
+                        </span>
+                    </label>
+                    <input type="number" name="BloodPressure" value="{{ request.form.get('BloodPressure', '') }}" required>
+                </div>
+                <div class="form-group">
+                    <label>
+                        Skin Thickness
+                        <span class="tooltip">
+                            <button type="button" class="info-btn" onclick="showInfo('skinThickness')">&#9432;</button>
+                            <span class="tooltiptext">Learn more</span>
+                        </span>
+                    </label>
+                    <input type="number" name="SkinThickness" value="{{ request.form.get('SkinThickness', '') }}" required>
+                </div>
+                <div class="form-group">
+                    <label>
+                        Insulin
+                        <span class="tooltip">
+                            <button type="button" class="info-btn" onclick="showInfo('insulin')">&#9432;</button>
+                            <span class="tooltiptext">Learn more</span>
+                        </span>
+                    </label>
+                    <input type="number" name="Insulin" value="{{ request.form.get('Insulin', '') }}" required>
+                </div>
+                <div class="form-group">
+                    <label>
+                        BMI
+                        <span class="tooltip">
+                            <button type="button" class="info-btn" onclick="showInfo('bmi')">&#9432;</button>
+                            <span class="tooltiptext">Learn more</span>
+                        </span>
+                    </label>
+                    <input type="number" step="any" name="BMI" value="{{ request.form.get('BMI', '') }}" required>
+                </div>
+                <div class="form-group">
+                    <label>
+                        Diabetes Pedigree Function
+                        <span class="tooltip">
+                            <button type="button" class="info-btn" onclick="showInfo('pedigree')">&#9432;</button>
+                            <span class="tooltiptext">Learn more</span>
+                        </span>
+                    </label>
+                    <input type="number" step="any" name="DiabetesPedigreeFunction" value="{{ request.form.get('DiabetesPedigreeFunction', '') }}" required>
+                </div>
+                <div class="form-group">
+                    <label>
+                        Age
+                        <span class="tooltip">
+                            <button type="button" class="info-btn" onclick="showInfo('age')">&#9432;</button>
+                            <span class="tooltiptext">Learn more</span>
+                        </span>
+                    </label>
+                    <input type="number" name="Age" value="{{ request.form.get('Age', '') }}" required>
+                </div>
+                <button type="submit">Predict Risk</button>
+            </form>
+            
+            {% if prediction_text %}
+                <div class="result">
+                    <h3>{{ prediction_text }}</h3>
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="info-panel">
+            <h3>Health Parameter Guide</h3>
+            <div class="info-content" id="infoContent">
+                <div class="welcome-message">
+                    <h4>Welcome to Diabetes Risk Assessment</h4>
+                    <p>Click on info button next to the input fields to learn more about each health parameter and their normal ranges.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const infoData = {
+            pregnancies: {
+                title: "Number of Pregnancies",
+                description: "The number of times you have been pregnant. This is a risk factor because pregnancy can affect blood sugar levels and insulin sensitivity.",
+                normal: "Normal range: 0-10 pregnancies",
+                risk: "Higher number of pregnancies may increase diabetes risk"
+            },
+            glucose: {
+                title: "Glucose Level",
+                description: "Blood glucose concentration measured in mg/dL. This is typically measured after fasting or during an oral glucose tolerance test.",
+                normal: "Normal: 70-99 mg/dL (fasting)\nPre-diabetes: 100-125 mg/dL\nDiabetes: ≥126 mg/dL",
+                risk: "Higher glucose levels indicate increased diabetes risk"
+            },
+            bloodPressure: {
+                title: "Blood Pressure",
+                description: "Diastolic blood pressure (the bottom number) measured in mmHg. High blood pressure is often associated with diabetes.",
+                normal: "Normal: <80 mmHg (diastolic)\nElevated: 80-89 mmHg\nHigh: ≥90 mmHg",
+                risk: "Higher blood pressure increases diabetes risk"
+            },
+            skinThickness: {
+                title: "Skin Thickness",
+                description: "Triceps skin fold thickness measured in mm. This is an indicator of body fat percentage and obesity.",
+                normal: "Normal range: 10-40 mm\nAverage: 20-30 mm",
+                risk: "Higher skin thickness may indicate obesity, a diabetes risk factor"
+            },
+            insulin: {
+                title: "Insulin Level",
+                description: "Serum insulin level measured in μU/mL. Insulin is the hormone that regulates blood sugar levels.",
+                normal: "Normal: 2.6-24.9 μU/mL (fasting)\nAverage: 5-15 μU/mL",
+                risk: "Very high or very low insulin levels can indicate diabetes risk"
+            },
+            bmi: {
+                title: "Body Mass Index (BMI)",
+                description: "Body Mass Index calculated as weight(kg)/height(m)². BMI is a measure of body fat based on height and weight.",
+                normal: "Underweight: <18.5\nNormal: 18.5-24.9\nOverweight: 25-29.9\nObese: ≥30",
+                risk: "Higher BMI (especially ≥25) increases diabetes risk"
+            },
+            pedigree: {
+                title: "Diabetes Pedigree Function",
+                description: "A function that scores the likelihood of diabetes based on family history. It considers diabetes history in relatives and their genetic relationship to you.",
+                normal: "Normal range: 0.078-2.42\nLower values: <0.5\nHigher values: >1.0",
+                risk: "Higher values indicate stronger family history of diabetes"
+            },
+            age: {
+                title: "Age",
+                description: "Your current age in years. Age is a significant risk factor for Type 2 diabetes.",
+                normal: "Risk increases with age\nLow risk: <45 years\nModerate risk: 45-64 years\nHigh risk: ≥65 years",
+                risk: "Diabetes risk increases significantly after age 45"
+            }
+        };
+
+        function showInfo(parameter) {
+            const info = infoData[parameter];
+            const infoContent = document.getElementById('infoContent');
+            
+            infoContent.innerHTML = `
+                <div class="parameter-info">
+                    <h4>${info.title}</h4>
+                    <p class="description">${info.description}</p>
+                    <div class="normal-range">
+                        <strong>Normal Ranges:</strong>
+                        <pre>${info.normal}</pre>
+                    </div>
+                    <div class="risk-info">
+                        <strong>Risk Factor:</strong>
+                        <p>${info.risk}</p>
+                    </div>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
